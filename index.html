@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Bot - Pairing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3);
+        }
+
+        .logo svg {
+            width: 50px;
+            height: 50px;
+            fill: white;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .status.loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.ready {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .qr-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .qr-code {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .instructions h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            color: #666;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            font-size: 24px;
+            color: #155724;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .messages {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .messages h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .message {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid #667eea;
+        }
+
+        .message-from {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 14px;
+        }
+
+        .message-body {
+            color: #333;
+            margin-top: 5px;
+        }
+
+        .message-time {
+            color: #999;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <svg viewBox="0 0 24 24">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+            </div>
+            <h1>WhatsApp Bot</h1>
+            <p class="subtitle">Connect your WhatsApp account</p>
+        </div>
+
+        <div id="statusMessage" class="status loading">
+            Connecting to server...
+        </div>
+
+        <div id="qrContainer" class="qr-container">
+            <div class="spinner"></div>
+        </div>
+
+        <div class="instructions">
+            <h3>📱 How to Connect:</h3>
+            <ol>
+                <li>Open <strong>WhatsApp</strong> on your phone</li>
+                <li>Tap <strong>Menu</strong> or <strong>Settings</strong></li>
+                <li>Tap <strong>Linked Devices</strong></li>
+                <li>Tap <strong>Link a Device</strong></li>
+                <li>Point your phone at the QR code above</li>
+            </ol>
+        </div>
+
+        <div id="messagesContainer" style="display: none;" class="messages">
+            <h3>📨 Recent Messages:</h3>
+            <div id="messagesList"></div>
+        </div>
+
+        <div class="footer">
+            Made with ❤️ using <a href="https://github.com/pedroslopez/whatsapp-web.js" target="_blank">whatsapp-web.js</a>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const statusMessage = document.getElementById('statusMessage');
+        const qrContainer = document.getElementById('qrContainer');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messagesList = document.getElementById('messagesList');
+
+        // Connection status
+        socket.on('connect', () => {
+            console.log('Connected to server');
+            updateStatus('Connected! Waiting for QR code...', 'loading');
+        });
+
+        // QR code received
+        socket.on('qr', (qrData) => {
+            console.log('QR code received');
+            updateStatus('Scan the QR code with WhatsApp', 'loading');
+            qrContainer.innerHTML = `<img src="${qrData}" alt="QR Code" class="qr-code">`;
+        });
+
+        // Bot ready
+        socket.on('ready', () => {
+            console.log('Bot is ready!');
+            updateStatus('✅ Connected Successfully!', 'ready');
+            qrContainer.innerHTML = `
+                <div>
+                    <div class="success-icon">✅</div>
+                    <div class="success-message">Successfully Connected!</div>
+                    <p style="color: #666;">Your WhatsApp bot is now active and listening for messages.</p>
+                </div>
+            `;
+            messagesContainer.style.display = 'block';
+        });
+
+        // Status update
+        socket.on('status', (data) => {
+            if (data.ready) {
+                updateStatus('✅ ' + (data.message || 'Connected!'), 'ready');
+            } else {
+                updateStatus(data.message || 'Connecting...', 'loading');
+            }
+        });
+
+        // New message received
+        socket.on('message', (data) => {
+            addMessage(data);
+        });
+
+        // Disconnect
+        socket.on('disconnect', () => {
+            updateStatus('❌ Disconnected from server', 'error');
+            qrContainer.innerHTML = '<div class="spinner"></div>';
+        });
+
+        function updateStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status ${type}`;
+        }
+
+        function addMessage(data) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            
+            const time = new Date(data.timestamp * 1000).toLocaleTimeString('si-LK');
+            const from = data.from.replace('@c.us', '').replace('@g.us', '');
+            
+            messageDiv.innerHTML = `
+                <div class="message-from">${from}</div>
+                <div class="message-body">${escapeHtml(data.body)}</div>
+                <div class="message-time">${time}</div>
+            `;
+            
+            messagesList.insertBefore(messageDiv, messagesList.firstChild);
+            
+            // Keep only last 10 messages
+            while (messagesList.children.length > 10) {
+                messagesList.removeChild(messagesList.lastChild);
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "whatsapp-bot",
+  "version": "1.0.0",
+  "description": "WhatsApp Bot with GitHub Actions and Pairing Site",
+  "main": "src/bot.js",
+  "scripts": {
+    "start": "node src/bot.js",
+    "web": "node src/server.js",
+    "dev": "nodemon src/bot.js"
+  },
+  "keywords": ["whatsapp", "bot", "automation"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "whatsapp-web.js": "^1.23.0",
+    "qrcode-terminal": "^0.12.0",
+    "qrcode": "^1.5.3",
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
